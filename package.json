@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack",
+    "start": "webpack-dev-server"
   },
   "author": "Paolo Bueno <paolo@wearereasonablepeople.com>",
   "license": "MIT",
@@ -16,6 +17,8 @@
     "@types/react": "^16.4.7",
     "@types/react-dom": "^16.0.7",
     "awesome-typescript-loader": "^5.2.0",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
     "ramda": "^0.25.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
@@ -25,7 +28,9 @@
     "warped-components": "paolobueno/gitpkg-registry#warped-components-v0.2.5-gitpkg",
     "warped-reducers": "paolobueno/gitpkg-registry#warped-reducers-v1.0.5-gitpkg",
     "webpack": "^4.17.1",
-    "webpack-command": "^0.4.1",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.6",
     "xstream": "^11.7.0"
-  }
+  },
+  "dependencies": {}
 }
