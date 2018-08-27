@@ -1,0 +1,31 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "author": "Paolo Bueno <paolo@wearereasonablepeople.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@cycle/http": "^14.10.0",
+    "@cycle/run": "github:paolobueno/gitpkg-registry#cycle-run-v4.4.0-gitpkg",
+    "@types/ramda": "github:types/npm-ramda#dist",
+    "@types/react": "^16.4.7",
+    "@types/react-dom": "^16.0.7",
+    "awesome-typescript-loader": "^5.2.0",
+    "ramda": "^0.25.0",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "redux": "^4.0.0",
+    "source-map-loader": "^0.2.4",
+    "typescript": "^3.0.1",
+    "warped-components": "paolobueno/gitpkg-registry#warped-components-v0.2.5-gitpkg",
+    "warped-reducers": "paolobueno/gitpkg-registry#warped-reducers-v1.0.5-gitpkg",
+    "webpack": "^4.17.1",
+    "webpack-command": "^0.4.1",
+    "xstream": "^11.7.0"
+  }
+}
