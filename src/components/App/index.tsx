@@ -3,14 +3,14 @@ import {createReducer, noopAction} from 'warped-reducers';
 import {warped, WarpedPropsOf, WarpedSources} from 'warped-components';
 import {HTTPSource} from '@cycle/http';
 
-interface State {
-  app: {
-    data: string
+export interface State {
+  app?: {
+    data?: string
   },
 };
 
 export const selectors = {
-  data: (state: State) => state.app.data,
+  data: (state: State) => (state && state.app) ? state.app.data : '',
 };
 
 // We use warped-reducers to create our reducer and actions.
