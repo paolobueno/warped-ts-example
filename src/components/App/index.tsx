@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {createReducer, noopAction} from 'warped-reducers';
+import {createReducer, noopAction, CurriedHandler} from 'warped-reducers';
 import {warped, WarpedPropsOf, WarpedSources} from 'warped-components';
 import {HTTPSource} from '@cycle/http';
 
@@ -15,19 +15,20 @@ export const selectors = {
 
 // We use warped-reducers to create our reducer and actions.
 export const {types, actions, reducer} = createReducer ('App') ({
-  loadData: noopAction,
+  loadData: noopAction as CurriedHandler<{username: string}>,
   setData: (name: string) => (state: State) => ({...state, app: {data: name}}),
 });
 
 interface Sources extends WarpedSources {
   http: HTTPSource
 }
+
 // A small Cycle app describes the side-effects of our component.
 export const effects = ({action, http}: Sources) => ({
-  http: action.filter (({type}) => type === types.loadData).mapTo ({
-    url: 'https://api.github.com/users/Avaq',
+  http: action.filter (({type}) => type === types.loadData).map (({username}) => ({
+    url: `https://api.github.com/users/${username}`,
     category: types.loadData
-  }),
+  })),
   action: http.select (types.loadData).flatten ().map (({body: {name}}) =>
     actions.setData (name)
   )
@@ -45,7 +46,7 @@ export const SFC = warp((props) => {
   return (
   <div>
     <h1>{data || 'name unknown'}</h1>
-    <button onClick={loadData}>Load!</button>
+    <button onClick={() => loadData({username: 'Avaq'})}>Load!</button>
   </div>
   )
 });
@@ -58,7 +59,7 @@ class App extends React.Component<WarpedPropsOf<typeof warp> & {greeting: string
     return (
       <div>
         <h1>{greeting || 'Hello '}{data || 'name unknown'}</h1>
-        <button onClick={loadData}>Load!</button>
+        <button onClick={() => loadData({username: 'Avaq'})}>Load!</button>
       </div>
     );
   }
