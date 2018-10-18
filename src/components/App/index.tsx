@@ -1,65 +1,47 @@
 import * as React from 'react';
-import {createReducer, noopAction, CurriedHandler} from 'warped-reducers';
-import {warped, WarpedPropsOf, WarpedSources} from 'warped-components';
-import {HTTPSource} from '@cycle/http';
-
-export interface State {
-  app?: {
-    data?: string
-  },
-};
+import {warped, WarpedPropsOf} from 'warped-components';
+import effects from './effects';
+import {reducer, actions, dataLens, itemsLens} from './state';
 
 export const selectors = {
-  data: (state: State) => (state && state.app) ? state.app.data : '',
+  data: dataLens.get,
+  items: itemsLens.get,
 };
 
-// We use warped-reducers to create our reducer and actions.
-export const {types, actions, reducer} = createReducer ('App') ({
-  loadData: noopAction as CurriedHandler<{username: string}>,
-  setData: (name: string) => (state: State) => ({...state, app: {data: name}}),
-});
-
-interface Sources extends WarpedSources {
-  http: HTTPSource
-}
-
-// A small Cycle app describes the side-effects of our component.
-export const effects = ({action, http}: Sources) => ({
-  http: action.filter (({type}) => type === types.loadData).map (({username}) => ({
-    url: `https://api.github.com/users/${username}`,
-    category: types.loadData
-  })),
-  action: http.select (types.loadData).flatten ().map (({body: {name}}) =>
-    actions.setData (name)
-  )
-});
-
-const warp = warped ({reducer, effects, selectors, actions});
+const warp = warped({reducer, effects, selectors, actions});
 
 // Functional Component example
-export const SFC = warp((props) => {
+export const SFCApp = warp(({data, loadData, addItem, items}) => {
   // props can be inferred if functional component is defined inline with the partially-applied
   // function call.
   // The alternative is:
   //   const namedSFC = (props: WarpedPropsOf<typeof warp>) => { ... }; export default warp(namedSFC);
-  const {data, loadData} = props;
   return (
-  <div>
-    <h1>{data || 'name unknown'}</h1>
-    <button onClick={() => loadData({username: 'Avaq'})}>Load!</button>
-  </div>
-  )
+    <div>
+      <h1>{data}</h1>
+      <ul>
+        {items.map(item => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+      <button onClick={() => loadData({username: 'Avaq'})}>Load!</button>
+      <button onClick={() => addItem(-items.length)}>Add!</button>
+    </div>
+  );
 });
 
 // Class component example
 // has additional `greeting` required prop
 class App extends React.Component<WarpedPropsOf<typeof warp> & {greeting: string}> {
   render() {
-    const {data, loadData, greeting} = this.props;
+    const {data, setData, greeting} = this.props;
     return (
       <div>
-        <h1>{greeting || 'Hello '}{data || 'name unknown'}</h1>
-        <button onClick={() => loadData({username: 'Avaq'})}>Load!</button>
+        <h1>
+          {greeting}
+          {data}
+        </h1>
+        <button onClick={() => setData('Avaq')}>Load!</button>
       </div>
     );
   }
