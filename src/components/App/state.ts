@@ -11,10 +11,12 @@ export const dataLens = baseLens.compose(lensProp('data', ''));
 export const itemsLens = normalize<number[]>(sortWith([ascend(identity)]))(
   baseLens.compose(lensProp('items', [])),
 );
+export const queryLens = baseLens.compose(lensProp('query', 'Avaq'));
 
 export interface AppComponentState {
   data?: string;
   items?: number[];
+  query?: string;
 }
 
 // We use warped-reducers to create our reducer and actions.
