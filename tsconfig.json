@@ -3,9 +3,12 @@
     "outDir": "./dist/",
     "sourceMap": true,
     "noImplicitAny": true,
-    "module": "commonjs",
-    "target": "es5",
-    "jsx": "react"
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "es2017",
+    "jsx": "react",
+    "strict": true,
+    "strictFunctionTypes": false,
   },
   "paths": {
     "ramda": [
