@@ -1,17 +1,19 @@
-import createReducer, {noopAction, ActionHandler, getActions, getTypes} from 'warped-reducers';
+import createReducer, {getActions, getTypes} from 'warped-reducers';
 import {append, sortWith, identity, ascend} from 'ramda';
+import {sort} from 'fp-ts/lib/Array';
 import {Lens} from 'monocle-ts';
 import {AppState, baseStateFor} from '../../appState';
-import {setLens, normalize} from '../../util/lenses';
+import {normalize} from '../../util/lenses';
+import {ordNumber} from 'fp-ts/lib/Ord';
 
 const lensProp = Lens.fromNullableProp<AppComponentState>();
 
+const sortNumRamda = normalize<number[]>(sortWith([ascend(identity)]));
+const sortNum = normalize(sort(ordNumber));
+
 const baseLens = baseStateFor('app');
-export const dataLens = baseLens.compose(lensProp('data', ''));
-export const itemsLens = normalize<number[]>(sortWith([ascend(identity)]))(
-  baseLens.compose(lensProp('items', [])),
-);
-export const queryLens = baseLens.compose(lensProp('query', 'Avaq'));
+export const itemsLens = sortNum(baseLens.compose(lensProp('items', [])));
+export const itemsRamdaLens = sortNumRamda(baseLens.compose(lensProp('items', [])));
 
 export interface AppComponentState {
   data?: string;
@@ -21,11 +23,8 @@ export interface AppComponentState {
 
 // We use warped-reducers to create our reducer and actions.
 export const {reducer, handlers} = createReducer<AppState>('App')({
-  loadData: noopAction as ActionHandler<{username: string}, any>,
-  setData: setLens(dataLens),
   addItem: (item: number) => itemsLens.modify(append(item)),
 });
-
 
 export const actions = getActions(handlers);
 export const types = getTypes(handlers);

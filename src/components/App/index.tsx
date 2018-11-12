@@ -1,48 +1,65 @@
 import * as React from 'react';
-import {warped, WarpedPropsOf} from 'warped-components';
-import effects from './effects';
-import {reducer, actions, dataLens, itemsLens} from './state';
+import {warped, Warped} from 'warped-components';
+import {reducer, actions, itemsLens} from './state';
+import GhService from '../GhService';
+import {actions as ghActions, usernameLens} from '../GhService/state';
 
 export const selectors = {
-  data: dataLens.get,
   items: itemsLens.get,
+  username: usernameLens.get,
 };
 
-const warp = warped({reducer, effects, selectors, actions});
+const warp = warped({
+  reducer,
+  selectors,
+  actions: {
+    ...actions,
+    ...ghActions,
+  },
+});
 
-// Functional Component example
-export const SFCApp = warp(({data, loadData, addItem, items}) => {
+const sfc = (props: Warped<typeof warp> & {greeting: string}) => {
+  const {addItem, items, loadUser, username} = props;
   // props can be inferred if functional component is defined inline with the partially-applied
   // function call.
   // The alternative is:
   //   const namedSFC = (props: WarpedPropsOf<typeof warp>) => { ... }; export default warp(namedSFC);
   return (
     <div>
-      <h1>{data}</h1>
+      <h1>{username}</h1>
       <ul>
         {items.map(item => (
           <li key={item}>{item}</li>
         ))}
       </ul>
-      <button onClick={() => loadData({username: 'Avaq'})}>Load!</button>
+      <button onClick={() => loadUser({username: 'Avaq'})}>Load!</button>
       <button onClick={() => addItem(-items.length)}>Add!</button>
     </div>
   );
-});
+};
+sfc.defaultProps = {
+  greeting: 'hello',
+};
+
+// Functional Component example
+export const SFCExample = warp(sfc);
 
 // Class component example
 // has additional `greeting` required prop
-class App extends React.Component<WarpedPropsOf<typeof warp> & {greeting: string}> {
+class App extends React.Component<Warped<typeof warp> & {greeting: string}> {
   render() {
-    const {data, setData, greeting} = this.props;
+    const {username, greeting, setUser} = this.props;
     return (
-      <div>
-        <h1>
-          {greeting}
-          {data}
-        </h1>
-        <button onClick={() => setData('Avaq')}>Load!</button>
-      </div>
+      <>
+        <GhService />
+        <div>
+          <h1>
+            {greeting}
+            {username}
+          </h1>
+          <button onClick={() => setUser('Avaq')}>Load!</button>
+        </div>
+      </>
     );
   }
 }
