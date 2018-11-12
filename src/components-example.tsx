@@ -1,7 +1,8 @@
 import {warped, WarpedSources, Warped} from 'warped-components';
 import {
   createReducer, noopAction, getTypes, getActions,
-  PayloadsOf
+  PayloadsOf,
+  ActionHandler
 } from 'warped-reducers';
 import * as React from 'react';
 import {Lens} from 'monocle-ts';
@@ -18,9 +19,9 @@ const dataState = Lens.fromPath <State>() (['app', 'data'])
 export const selectors = {
   data: dataState.get
 };
-export const {handlers, reducer} = createReducer ('App') ({
-  loadData: noopAction,
-  setData: dataState.set
+export const {handlers, reducer} = createReducer <State>('App') ({
+  setData: dataState.set,
+  loadData: noopAction as ActionHandler<{username: string}, State>,
 });
 const types = getTypes (handlers);
 const actions = getActions (handlers);
@@ -30,10 +31,10 @@ type Sources = WarpedSources<State, PayloadsOf<typeof handlers>> & {
   http: HTTPSource
 };
 export const effects = ({action, http}: Sources) => ({
-  http: action.select (handlers.loadData).mapTo ({
-    url: 'https://api.github.com/users/Avaq',
+  http: action.select (handlers.loadData).map (({payload: {username}}) => ({
+    url: `https://api.github.com/users/${username}`,
     category: types.loadData
-  }),
+  })),
   action: http.select (types.loadData).flatten ().map (({body: {name}}) =>
     actions.setData (name)
   )
@@ -47,7 +48,7 @@ type Props = Warped<typeof warp> & {otherProp?: string};
 export const App = ({data, loadData}: Props) => (
   <div>
     <h1>{data || 'name unknown'}</h1>
-    <button onClick={loadData}>Load!</button>
+    <button onClick={() => loadData({username: 'Avaq'})}>Load!</button>
   </div>
 );
 
